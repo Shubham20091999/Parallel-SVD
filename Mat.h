@@ -10,7 +10,6 @@
 #define NUM_THREADS 8
 #endif // !NUM_Threads
 
-
 using namespace std;
 
 struct SVDMats;
@@ -28,22 +27,22 @@ public:
 	template <typename T>
 	Mat(std::initializer_list<std::initializer_list<T>> e);
 
-	friend std::ostream& operator<<(std::ostream& os, const Mat& a);
+	friend std::ostream &operator<<(std::ostream &os, const Mat &a);
 
-	double& operator()(int i, int j);
+	double &operator()(int i, int j);
 	double operator()(int i, int j) const;
 
 	static Mat Identity(int m);
 	void Identity();
 
 	double Get(const int m, const int n) const;
-	double& Get(const int m, const int n);
+	double &Get(const int m, const int n);
 
-	Mat operator*(const Mat& alt) const;
+	Mat operator*(const Mat &alt) const;
 
 	Mat Transpose();
-	static Mat Transpose(const Mat& A);
-	Mat Mult_UTxAxU(const Mat& U);
+	static Mat Transpose(const Mat &A);
+	Mat Mult_UTxAxU(const Mat &U);
 
 	//Algorithms
 	double errorVal();
@@ -57,17 +56,17 @@ public:
 	void EigenHQR(const bool info = false, const double tol = pow(10, -8));
 
 	//Serial Two Sided Jacobi
-	void IterSeial2JAC(int i, int j, Mat& U);
-	static Mat EigenOptimizedSerial2JAC(Mat& A, const bool info = false, const double tol = pow(10, -8));
+	void IterSeial2JAC(int i, int j, Mat &U);
+	static Mat EigenOptimizedSerial2JAC(Mat &A, const bool info = false, const double tol = pow(10, -8));
 
 	//Parallel Two Sided Jacobi
-	void IterParallel2JAC(Mat& U, int i, int j);
-	static Mat EigenParallel2JAC(Mat& A, const bool info = false, const double tol = pow(10, -8));
+	void IterParallel2JAC(Mat &U, int i, int j);
+	static Mat EigenParallel2JAC(Mat &A, const bool info = false, const double tol = pow(10, -8));
 
 	//SVD
-	static void getSortedEigVec(Mat& Val, Mat& Vec);
-	static void getSortedEigVal(Mat& Val);
-	static SVDMats SVD(Mat& A, function<Mat(Mat&, bool, double)> EigenFn, const bool info = false, const double tol = pow(10, -8));
+	static void getSortedEigVec(Mat &Val, Mat &Vec);
+	static void getSortedEigVal(Mat &Val);
+	static SVDMats SVD(Mat &A, function<Mat(Mat &, bool, double)> EigenFn, const bool info = false, const double tol = pow(10, -8));
 };
 
 struct SVDMats
@@ -165,9 +164,9 @@ void Mat::EigenQR(const bool info, const double tol)
 	if (info)
 	{
 		std::cout << "QR\n"
-			<< "Time Taken: " << delta << "\n"
-			<< "Number of Iteration: "
-			<< numiter << "\n";
+				  << "Time Taken: " << delta << "\n"
+				  << "Number of Iteration: "
+				  << numiter << "\n";
 	}
 }
 
@@ -302,13 +301,13 @@ void Mat::EigenHQR(const bool info, const double tol)
 
 	if (info)
 		std::cout << "Hessenberg QR\n"
-		<< "Time Taken: " << delta << "\n"
-		<< "Number of Iteration: " << numiter << "\n";
+				  << "Time Taken: " << delta << "\n"
+				  << "Number of Iteration: " << numiter << "\n";
 }
 
 //---------------------------------------------Serial Two Sided Jacobi---------------------------------------
 
-void Mat::IterSeial2JAC(int i, int j, Mat& U)
+void Mat::IterSeial2JAC(int i, int j, Mat &U)
 {
 	/*function A = do(A, i, j)
 		n = length(A);
@@ -367,7 +366,7 @@ void Mat::IterSeial2JAC(int i, int j, Mat& U)
 	Get(j, i) = 0;
 }
 
-Mat Mat::EigenOptimizedSerial2JAC(Mat& A, const bool info, const double tol)
+Mat Mat::EigenOptimizedSerial2JAC(Mat &A, const bool info, const double tol)
 {
 	/*for niter = 1:20
 		for k = 1 : n - 1
@@ -395,7 +394,7 @@ Mat Mat::EigenOptimizedSerial2JAC(Mat& A, const bool info, const double tol)
 	t.begin();
 	Mat J = Identity(nrows);
 	while (ratio > tol)
-		//for (size_t i = 0; i < 1; i++)
+	//for (size_t i = 0; i < 1; i++)
 	{
 		for (int i = 0; i < nrows; i++)
 		{
@@ -412,8 +411,8 @@ Mat Mat::EigenOptimizedSerial2JAC(Mat& A, const bool info, const double tol)
 	if (info)
 	{
 		std::cout << "Serial Two Sided Jacobi\n"
-			<< "Time Taken: " << delta << "\n"
-			<< "Number of Iteration: " << numiter << "\n";
+				  << "Time Taken: " << delta << "\n"
+				  << "Number of Iteration: " << numiter << "\n";
 	}
 
 	return J;
@@ -421,7 +420,7 @@ Mat Mat::EigenOptimizedSerial2JAC(Mat& A, const bool info, const double tol)
 
 //---------------------------------------------Parallel Two Sided Jacobi-------------------------------------
 
-void Mat::IterParallel2JAC(Mat& U, int i, int j)
+void Mat::IterParallel2JAC(Mat &U, int i, int j)
 {
 	/*function U = do(A, U, i, j)
 	th = (A(j, j) - A(i, i)) / 2 / A(i, j);
@@ -456,7 +455,7 @@ void Mat::IterParallel2JAC(Mat& U, int i, int j)
 //We tried to make the code such that it does not initalize and destroy threads
 //multiple times in a single iteration but that code took almost the same amount of time
 //as this current code, so for better readability we kept the simplified code.
-Mat Mat::EigenParallel2JAC(Mat& A, const bool info, const double tol)
+Mat Mat::EigenParallel2JAC(Mat &A, const bool info, const double tol)
 {
 	/*J = eye(n);
 	for niter = 1:30
@@ -549,9 +548,9 @@ Mat Mat::EigenParallel2JAC(Mat& A, const bool info, const double tol)
 	if (info)
 	{
 		std::cout << "Parallel Two Sided Jacobi\n"
-			<< "Time Taken: " << delta << "\n"
-			<< "Number of Iteration: "
-			<< numiter << "\n";
+				  << "Time Taken: " << delta << "\n"
+				  << "Number of Iteration: "
+				  << numiter << "\n";
 	}
 
 	return J;
@@ -559,7 +558,7 @@ Mat Mat::EigenParallel2JAC(Mat& A, const bool info, const double tol)
 
 //---------------------------------------------SVD----------------------------------------------------
 
-void Mat::getSortedEigVec(Mat& Val, Mat& Vec)
+void Mat::getSortedEigVec(Mat &Val, Mat &Vec)
 {
 	vector<int> pos(Vec.nrows, 0);
 	vector<int> bucket(Vec.nrows, 0);
@@ -590,7 +589,7 @@ void Mat::getSortedEigVec(Mat& Val, Mat& Vec)
 	}
 }
 
-void Mat::getSortedEigVal(Mat& Val)
+void Mat::getSortedEigVal(Mat &Val)
 {
 	//Implement parallalized Bubble sort
 	for (int i = 0; i < Val.nrows; i++)
@@ -610,7 +609,7 @@ void Mat::getSortedEigVal(Mat& Val)
 	}
 }
 
-SVDMats Mat::SVD(Mat& A, function<Mat(Mat&, bool, double)> EigenFn, const bool info, const double tol)
+SVDMats Mat::SVD(Mat &A, function<Mat(Mat &, bool, double)> EigenFn, const bool info, const double tol)
 {
 	Timer t;
 	t.begin();
@@ -619,19 +618,19 @@ SVDMats Mat::SVD(Mat& A, function<Mat(Mat&, bool, double)> EigenFn, const bool i
 	Mat AAT = A * AT;
 
 	//As we dont need the AT I just aliased it as tmp_V(same for tmp_U later)
-	Mat& tmp_V = AT;
+	Mat &tmp_V = AT;
 	tmp_V = EigenFn(ATA, false, tol);
 	//We dont need ATA anymore so recycling it
 	getSortedEigVec(ATA, tmp_V);
-	Mat& V = ATA;
+	Mat &V = ATA;
 
 	//cout << V;
 
-	Mat& tmp_U = AT;
+	Mat &tmp_U = AT;
 	tmp_U = EigenFn(AAT, false, tol);
 	//We dont need AAT anymore so recycling it
 	getSortedEigVec(AAT, tmp_U);
-	Mat& U = AAT;
+	Mat &U = AAT;
 
 	EigenFn(A, false, tol);
 	getSortedEigVal(A);
@@ -641,9 +640,17 @@ SVDMats Mat::SVD(Mat& A, function<Mat(Mat&, bool, double)> EigenFn, const bool i
 	if (info)
 	{
 		std::cout << "SVD\n"
-			<< "Time Taken: " << delta << "\n";
+				  << "Time Taken: " << delta << "\n";
 	}
-
+	for (int i = 0; i < A.nrows; i++)
+	{
+		if (A(i, i) < 0)
+		{
+			for (int j = 0; j < A.nrows; j++)
+				V(j, i) *= -1;
+			A(i, i) *= -1;
+		}
+	}
 	return SVDMats{
 		V,
 		A,
@@ -652,16 +659,16 @@ SVDMats Mat::SVD(Mat& A, function<Mat(Mat&, bool, double)> EigenFn, const bool i
 }
 
 //---------------------------------------------Misc functions---------------------------------------
-Mat::Mat(const int m) : nrows(m), m_mat(vec(m* m, 0)) {}
+Mat::Mat(const int m) : nrows(m), m_mat(vec(m * m, 0)) {}
 
 template <typename T>
 Mat::Mat(std::initializer_list<std::initializer_list<T>> e)
-	: nrows(e.size()), m_mat(vec(nrows* nrows))
+	: nrows(e.size()), m_mat(vec(nrows * nrows))
 {
 	unsigned int i = 0;
-	for (auto& row : e)
+	for (auto &row : e)
 	{
-		for (auto& col : row)
+		for (auto &col : row)
 		{
 			m_mat[i] = col;
 			i += 1;
@@ -671,7 +678,7 @@ Mat::Mat(std::initializer_list<std::initializer_list<T>> e)
 	}
 }
 
-Mat Mat::operator*(const Mat& alt) const
+Mat Mat::operator*(const Mat &alt) const
 {
 	Mat ret(nrows);
 #pragma omp parallel for num_threads(NUM_THREADS) collapse(2)
@@ -690,7 +697,7 @@ Mat Mat::operator*(const Mat& alt) const
 	return ret;
 }
 
-double& Mat::operator()(int i, int j)
+double &Mat::operator()(int i, int j)
 {
 	return Get(i, j);
 }
@@ -700,7 +707,7 @@ double Mat::operator()(int i, int j) const
 	return Get(i, j);
 }
 
-std::ostream& operator<<(std::ostream& os, const Mat& a)
+std::ostream &operator<<(std::ostream &os, const Mat &a)
 {
 	os << "\n[";
 	for (int i = 0; i < a.nrows; i++)
@@ -750,7 +757,7 @@ Mat Mat::Transpose()
 	return *this;
 }
 
-Mat Mat::Transpose(const Mat& A)
+Mat Mat::Transpose(const Mat &A)
 {
 	Mat ret(A.nrows);
 
@@ -769,12 +776,12 @@ double Mat::Get(const int m, const int n) const
 	return m_mat[m * nrows + n];
 }
 
-double& Mat::Get(const int m, const int n)
+double &Mat::Get(const int m, const int n)
 {
 	return m_mat[m * nrows + n];
 }
 
-Mat Mat::Mult_UTxAxU(const Mat& U)
+Mat Mat::Mult_UTxAxU(const Mat &U)
 {
 	Mat tmpM(nrows);
 #pragma omp parallel num_threads(NUM_THREADS)
